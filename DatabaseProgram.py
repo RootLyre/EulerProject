@@ -1,8 +1,19 @@
 from itertools import islice 
+#To check if the file exists at start
+from pathlib import Path 
 import re
+import os 
 
 def main():
     running = True
+
+    #cwd = get current working directory, must import OS to use 
+    path = os.getcwd()
+    filename = '/DatabaseFile.txt'
+    #print("Path: ", path)
+    file_path = path + filename
+
+    #Running the Program
     while(running):
         val = input("\nWhat would you like to do?: \n" 
         "Enter a new person? Press 1 \n"  
@@ -10,17 +21,14 @@ def main():
         "Edit information? Press 3 \n"
         "Quit the program? Press 0 \n"  
         "Input: ")
-
-        print(val)
         name = " "
         gender = " "
         age = " "
         occupation = " "
         #Check input
-        file_path = 'Database.txt'
         if val not in ["0", "1", "2", "3"]:
            print('\n' "THIS IS NOT A VALID INPUT. PLEASE TRY AGAIN")
-        #Edit Text File by Inserting åa new Person
+        #Edit Text File by Inserting a new Person
         if(val == "0"):
             running = False
             print("Goodbye.")
@@ -47,6 +55,8 @@ def main():
             with open(file_path, 'r+') as f:
                 searchFor = input("Who are you looking for?" '\n')
                 lines = f.readlines()
+                #Set default value because of a Traceback error 
+                number = 1
                 for line in lines:
                     if re.search(searchFor, line):
                         print("\nPerson(s) Found.")
@@ -57,22 +67,29 @@ def main():
                 if(counter > 1):
                     number = input("Input the Search Result # of the person you wish to view: ")
                     lines = f.readlines()
-                    print("Name being looked for: ", names[int(number)-1])
+                    searchFor = names[int(number)-1]
+                    print("Name being looked for: ", searchFor)
 
                 #Reset the file pointer
                 f.seek(0)
                 #Cant do a "for line in lines" while inside another "for line in lines"
                 count = 0
                 lines = f.readlines()
+                printOut = False
                 for line in lines:
                     if (re.search(names[int(number)-1], line)):
                         #Prepping to get next few lines that contain the person's info
                         count = 3
-                        print(line)
                     if(count >= 0):
-                        print(line)
-                        count-=1
+                        if re.search(searchFor, line):
+                            printOut = True
+                        if printOut:
+                            newLine = line.rstrip()
+                            print(newLine)
+                            count-=1
             f.close()
+            #Empty out the list
+            names.clear()
 
         
         #Edit Information
